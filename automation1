@@ -1,0 +1,37 @@
+from netmiko import ConnectHandler
+
+def network_automation():
+    device = {
+        'device_type': 'cisco_ios',  # Change based on your device type
+        'host': '192.168.1.1',       # Device IP
+        'username': 'admin',         # SSH username
+        'password': 'password',      # SSH password
+        'secret': 'enable_password', # Enable password (if needed)
+    }
+    
+    try:
+        connection = ConnectHandler(**device)
+        connection.enable()  # Enter enable mode
+        
+        commands = [
+            'show ip interface brief',
+            'show version',
+            'show running-config'
+        ]
+        
+        for cmd in commands:
+            output = connection.send_command(cmd)
+            print(f'Output of "{cmd}":\n{output}\n')
+            
+            # Save output to file
+            with open(f'output_{cmd.replace(" ", "_")}.txt', 'w') as f:
+                f.write(output)
+                
+        connection.disconnect()
+        print("Automation task completed successfully.")
+        
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    network_automation()
